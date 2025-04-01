@@ -56,6 +56,20 @@ func main() {
 		}
 	}
 
-	log.Println(mediaPlayer)
+	// var status string
+
+	obj := conn.Object(mediaPlayer, "/org/mpris/MediaPlayer2")
+
+	log.Println(obj.Destination())
+
+	log.Println(obj.Path())
+
+	test, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Metadata")
+
+	if err != nil {
+		log.Fatalf("Metadata: %d, %d", err, test)
+	}
+
+	log.Println(test)
 
 }
