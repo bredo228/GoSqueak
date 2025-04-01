@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"strings"
+	"runtime"
 
 	"github.com/godbus/dbus/v5"
 	"github.com/hypebeast/go-osc/osc"
@@ -84,6 +85,8 @@ func sendTrack(track Track, client *osc.Client) {
 func main() {
 
 	log.Println("Starting GoSqueak")
+
+	log.Printf("Running on platform %s\n", runtime.GOOS)
 
 	// init config
 	var config Config
