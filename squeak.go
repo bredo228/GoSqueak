@@ -24,6 +24,33 @@ func sendOscMessage(message string, path string, client *osc.Client) {
 	client.Send(msg)
 }
 
+func getCurrentTrack(obj dbus.BusObject) Track {
+
+	var track Track
+
+	data, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Metadata")
+
+	if err != nil {
+		log.Panicf("Failed getting property!")
+	}
+
+	metadata := data.Value().(map[string]dbus.Variant)
+
+	title := metadata["xesam:title"]
+	album := metadata["xesam:album"]
+	artist := metadata["xesam:artist"]
+
+	log.Println(artist.Value())
+
+	track.Title = title.String()
+	track.Album = album.String()
+	track.Artist = artist.String()
+
+	log.Printf("Found track %s by %s in %s\n", track.Title, track.Artist, track.Album)
+
+	return track
+}
+
 func main() {
 
 	log.Println("Starting SqueakLinux")
@@ -62,18 +89,10 @@ func main() {
 		}
 	}
 
-	// var status string
-
 	obj := conn.Object(mediaPlayer, "/org/mpris/MediaPlayer2")
 
-	data, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Metadata")
+	t := getCurrentTrack(obj)
 
-	if err != nil {
-		log.Fatalf("Metadata: %d, %d", err, data.Value())
-	}
-
-	metadata := data.Value()
-
-	log.Println(metadata)
+	log.Println(t)
 
 }
