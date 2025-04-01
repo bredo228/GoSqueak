@@ -11,7 +11,7 @@ type Track struct {
 
 type Config struct {
 	Port           int
-	UpdateRate     int
+	UpdateRate     float32
 	LastFmEnabled  bool
 	LastFmUsername string
 	LastFmKey      string

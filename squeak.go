@@ -69,8 +69,6 @@ func getCurrentTrack(obj dbus.BusObject) Track {
 		track.Position = int(pos_i64)
 	}
 
-	log.Printf("Found track %s by %s in %s with duration %d at position %d\n", track.Title, track.Artist, track.Album, track.Duration, track.Position)
-
 	return track
 }
 
@@ -95,7 +93,7 @@ func main() {
 	// init config
 	var config Config
 	config.Port = 9025
-	config.UpdateRate = 5
+	config.UpdateRate = 0.5
 
 	// init osc client
 	oscClient := osc.NewClient("127.0.0.1", int(config.Port))
@@ -153,6 +151,7 @@ func main() {
 
 		if previousTrack.Title != currentTrack.Title { // probably a better way to see if the track has changed
 			log.Println("Track title has changed!")
+			log.Printf("Found track %s by %s in %s\n", currentTrack.Title, currentTrack.Artist, currentTrack.Album)
 
 			// send the track before we do any updates
 			sendTrack(currentTrack, oscClient)
