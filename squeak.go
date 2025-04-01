@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
-	"strings"
 	"runtime"
+	"strings"
 
 	"github.com/godbus/dbus/v5"
 	"github.com/hypebeast/go-osc/osc"
@@ -43,17 +43,27 @@ func getCurrentTrack(obj dbus.BusObject) Track {
 	album := metadata["xesam:album"]
 	artist := metadata["xesam:artist"]
 
-	track.Title = title.Value().(string)
-	track.Album = album.Value().(string)
+	if title.Value() != nil {
+		track.Title = title.Value().(string)
+	}
 
-	artists := artist.Value().([]string)
-	track.Artist = artists[0]
+	if album.Value() != nil {
+		track.Album = album.Value().(string)
+	}
+
+	if artist.Value() != nil {
+		artists := artist.Value().([]string)
+		track.Artist = artists[0]
+	}
 
 	length := metadata["mpris:length"]
-	length_i64 := length.Value().(int64) / 1000000
-	duration := int(length_i64)
 
-	track.Duration = duration
+	if length.Value() != nil {
+		length_i64 := length.Value().(int64) / 1000000
+		duration := int(length_i64)
+
+		track.Duration = duration
+	}
 
 	// get progress
 	pos, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Position")
@@ -62,8 +72,10 @@ func getCurrentTrack(obj dbus.BusObject) Track {
 		log.Fatalf("Failed getting progress")
 	}
 
-	pos_i64 := pos.Value().(int64) / 1000000
-	track.Position = int(pos_i64)
+	if pos.Value() != nil {
+		pos_i64 := pos.Value().(int64) / 1000000
+		track.Position = int(pos_i64)
+	}
 
 	log.Printf("Found track %s by %s in %s with duration %d\n", track.Title, track.Artist, track.Album, track.Duration)
 
