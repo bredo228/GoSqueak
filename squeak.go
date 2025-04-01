@@ -13,12 +13,20 @@ type Config struct {
 }
 
 type Track struct {
-	Title  string
-	Album  string
-	Artist string
+	Title    string
+	Album    string
+	Artist   string
+	Duration int
+	Position int
 }
 
 func sendOscMessage(message string, path string, client *osc.Client) {
+	msg := osc.NewMessage(path)
+	msg.Append(message)
+	client.Send(msg)
+}
+
+func sendOscMessageInt(message int, path string, client *osc.Client) {
 	msg := osc.NewMessage(path)
 	msg.Append(message)
 	client.Send(msg)
@@ -40,15 +48,43 @@ func getCurrentTrack(obj dbus.BusObject) Track {
 	album := metadata["xesam:album"]
 	artist := metadata["xesam:artist"]
 
-	log.Println(artist.Value())
+	track.Title = title.Value().(string)
+	track.Album = album.Value().(string)
 
-	track.Title = title.String()
-	track.Album = album.String()
-	track.Artist = artist.String()
+	artists := artist.Value().([]string)
+	track.Artist = artists[0]
 
-	log.Printf("Found track %s by %s in %s\n", track.Title, track.Artist, track.Album)
+	length := metadata["mpris:length"]
+	length_i64 := length.Value().(int64) / 1000000
+	duration := int(length_i64)
+
+	track.Duration = duration
+
+	// get progress
+	pos, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Position")
+
+	if err != nil {
+		log.Fatalf("Failed getting progress")
+	}
+
+	pos_i64 := pos.Value().(int64) / 1000000
+	track.Position = int(pos_i64)
+
+	log.Printf("Found track %s by %s in %s with duration %d\n", track.Title, track.Artist, track.Album, track.Duration)
 
 	return track
+}
+
+func sendTrack(track Track, client *osc.Client) {
+
+	sendOscMessage(track.Title, "/squeaknp/track_title", client)
+	sendOscMessage(track.Album, "/squeaknp/track_album", client)
+	sendOscMessage(track.Artist, "/squeaknp/track_artist", client)
+
+	// TODO: these are floats not ints
+	sendOscMessageInt(track.Duration, "/squeaknp/timeline_end_time", client)
+	sendOscMessageInt(track.Position, "/squeaknp/timeline_position", client)
+
 }
 
 func main() {
@@ -93,6 +129,6 @@ func main() {
 
 	t := getCurrentTrack(obj)
 
-	log.Println(t)
+	sendTrack(t, oscClient)
 
 }
