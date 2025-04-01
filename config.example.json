@@ -1,6 +1,7 @@
 {
     "port": 9025,
     "updateRate": 10,
+    "lastFmEnabled": false,
     "lastFmUsername": null,
     "lastFmApiKey": null
 }
