@@ -6,21 +6,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/bredo228/GoSqueak/lastfm"
 	"github.com/godbus/dbus/v5"
 	"github.com/hypebeast/go-osc/osc"
+
+	. "github.com/bredo228/GoSqueak/datatypes"
 )
-
-type Config struct {
-	Port int
-}
-
-type Track struct {
-	Title    string
-	Album    string
-	Artist   string
-	Duration int
-	Position int
-}
 
 func sendOscMessage(message any, path string, client *osc.Client) {
 	msg := osc.NewMessage(path)
@@ -78,7 +69,7 @@ func getCurrentTrack(obj dbus.BusObject) Track {
 		track.Position = int(pos_i64)
 	}
 
-	log.Printf("Found track %s by %s in %s with duration %d\n", track.Title, track.Artist, track.Album, track.Duration)
+	log.Printf("Found track %s by %s in %s with duration %d at position %d\n", track.Title, track.Artist, track.Album, track.Duration, track.Position)
 
 	return track
 }
@@ -104,6 +95,7 @@ func main() {
 	// init config
 	var config Config
 	config.Port = 9025
+	config.UpdateRate = 5
 
 	// init osc client
 	oscClient := osc.NewClient("127.0.0.1", int(config.Port))
@@ -149,8 +141,36 @@ func main() {
 
 	obj := conn.Object(mediaPlayer, "/org/mpris/MediaPlayer2")
 
-	t := getCurrentTrack(obj)
+	var previousTrack Track
+	var currentTrack Track
 
-	sendTrack(t, oscClient)
+	// Main update loop
+	for {
+
+		previousTrack = currentTrack
+
+		currentTrack = getCurrentTrack(obj)
+
+		if previousTrack.Title != currentTrack.Title { // probably a better way to see if the track has changed
+			log.Println("Track title has changed!")
+
+			// send the track before we do any updates
+			sendTrack(currentTrack, oscClient)
+
+			currentTrack.Artwork = lastfm.GetTrackArtwork(currentTrack, config)
+
+			log.Println("Updated artwork to " + currentTrack.Artwork)
+
+		} else {
+			if previousTrack.Artwork != "" {
+				currentTrack.Artwork = previousTrack.Artwork
+			}
+		}
+
+		sendTrack(currentTrack, oscClient)
+
+		time.Sleep(time.Second * time.Duration(config.UpdateRate))
+
+	}
 
 }
