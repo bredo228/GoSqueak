@@ -98,8 +98,6 @@ func main() {
 	// init osc client
 	oscClient := osc.NewClient("127.0.0.1", int(config.Port))
 
-	sendOscMessage("testing", "/squeaknp/test", oscClient)
-
 	conn, err := dbus.ConnectSessionBus()
 
 	if err != nil {
