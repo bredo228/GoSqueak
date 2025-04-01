@@ -12,6 +12,12 @@ type Config struct {
 	Port int
 }
 
+type Track struct {
+	Title  string
+	Album  string
+	Artist string
+}
+
 func sendOscMessage(message string, path string, client *osc.Client) {
 	msg := osc.NewMessage(path)
 	msg.Append(message)
@@ -60,16 +66,14 @@ func main() {
 
 	obj := conn.Object(mediaPlayer, "/org/mpris/MediaPlayer2")
 
-	log.Println(obj.Destination())
-
-	log.Println(obj.Path())
-
-	test, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Metadata")
+	data, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Metadata")
 
 	if err != nil {
-		log.Fatalf("Metadata: %d, %d", err, test)
+		log.Fatalf("Metadata: %d, %d", err, data.Value())
 	}
 
-	log.Println(test)
+	metadata := data.Value()
+
+	log.Println(metadata)
 
 }
