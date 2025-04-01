@@ -1,4 +1,4 @@
-module github.com/bredo228/SqueakLinux
+module github.com/bredo228/GoSqueak
 
 go 1.24.1
 

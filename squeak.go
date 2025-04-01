@@ -83,7 +83,7 @@ func sendTrack(track Track, client *osc.Client) {
 
 func main() {
 
-	log.Println("Starting SqueakLinux")
+	log.Println("Starting GoSqueak")
 
 	// init config
 	var config Config
