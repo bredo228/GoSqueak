@@ -20,13 +20,7 @@ type Track struct {
 	Position int
 }
 
-func sendOscMessage(message string, path string, client *osc.Client) {
-	msg := osc.NewMessage(path)
-	msg.Append(message)
-	client.Send(msg)
-}
-
-func sendOscMessageInt(message int, path string, client *osc.Client) {
+func sendOscMessage(message any, path string, client *osc.Client) {
 	msg := osc.NewMessage(path)
 	msg.Append(message)
 	client.Send(msg)
@@ -82,8 +76,8 @@ func sendTrack(track Track, client *osc.Client) {
 	sendOscMessage(track.Artist, "/squeaknp/track_artist", client)
 
 	// TODO: these are floats not ints
-	sendOscMessageInt(track.Duration, "/squeaknp/timeline_end_time", client)
-	sendOscMessageInt(track.Position, "/squeaknp/timeline_position", client)
+	sendOscMessage(float32(track.Duration), "/squeaknp/timeline_end_time", client)
+	sendOscMessage(float32(track.Position), "/squeaknp/timeline_position", client)
 
 }
 
