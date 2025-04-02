@@ -10,9 +10,9 @@ type Track struct {
 }
 
 type Config struct {
-	Port           int     `json:"port"`
-	UpdateRate     float32 `json:"updateRate"`
-	LastFmEnabled  bool    `json:"lastFmEnabled"`
-	LastFmUsername string  `json:"lastFmUsername"`
-	LastFmApiKey   string  `json:"lastFmApiKey"`
+	Port           int    `json:"port"`
+	UpdateRate     int    `json:"updateRate"`
+	LastFmEnabled  bool   `json:"lastFmEnabled"`
+	LastFmUsername string `json:"lastFmUsername"`
+	LastFmApiKey   string `json:"lastFmApiKey"`
 }

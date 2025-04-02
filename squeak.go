@@ -177,7 +177,7 @@ func main() {
 
 		sendTrack(currentTrack, oscClient)
 
-		time.Sleep(time.Second * time.Duration(config.UpdateRate))
+		time.Sleep(time.Millisecond * time.Duration(config.UpdateRate))
 
 	}
 
