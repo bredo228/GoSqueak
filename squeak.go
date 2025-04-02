@@ -79,6 +79,7 @@ func sendTrack(track Track, client *osc.Client) {
 	sendOscMessage(track.Title, "/squeaknp/track_title", client)
 	sendOscMessage(track.Album, "/squeaknp/track_album", client)
 	sendOscMessage(track.Artist, "/squeaknp/track_artist", client)
+	sendOscMessage(track.Artwork, "/squeaknp/track_lastfm_album_art", client)
 
 	// TODO: these are floats not ints
 	sendOscMessage(float32(track.Duration), "/squeaknp/timeline_end_time", client)
