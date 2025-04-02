@@ -34,9 +34,13 @@ func GetTrackArtwork(track Track, config Config) string {
 
 	lastFmTrack := getTrackInfo(track, config)
 
-	log.Println(lastFmTrack.Album.Images)
+	if len(lastFmTrack.Album.Images) < 1 {
+		return ""
+	}
 
-	return "some album art"
+	image := lastFmTrack.Album.Images[len(lastFmTrack.Album.Images)-1]
+
+	return image.Text
 }
 
 func getTrackInfo(track Track, config Config) LastFmTrack {
@@ -74,8 +78,6 @@ func getTrackInfo(track Track, config Config) LastFmTrack {
 		log.Println("didn't get valid json in body!")
 		return lastFmTrack
 	}
-
-	log.Println(string(body))
 
 	var trackResponse LastFmTrackResponse
 
