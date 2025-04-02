@@ -166,7 +166,9 @@ func main() {
 			// send the track before we do any updates
 			sendTrack(currentTrack, oscClient)
 
-			currentTrack.Artwork = lastfm.GetTrackArtwork(currentTrack, config)
+			if config.LastFmEnabled {
+				currentTrack.Artwork = lastfm.GetTrackArtwork(currentTrack, config)
+			}
 
 			log.Println("Updated artwork to " + currentTrack.Artwork)
 
