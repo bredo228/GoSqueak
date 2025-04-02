@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
+	"os"
 	"runtime"
 	"strings"
 	"time"
@@ -91,9 +93,18 @@ func main() {
 	log.Printf("Running on platform %s\n", runtime.GOOS)
 
 	// init config
+
+	config_file, err := os.ReadFile("./config.json")
+	if err != nil {
+		log.Fatalf("Error when opening config file: %d\n", err)
+	}
+
 	var config Config
-	config.Port = 9025
-	config.UpdateRate = 0.5
+
+	err = json.Unmarshal(config_file, &config)
+	if err != nil {
+		log.Fatalf("Error unmarshaling config: %d\n", err)
+	}
 
 	// init osc client
 	oscClient := osc.NewClient("127.0.0.1", int(config.Port))
