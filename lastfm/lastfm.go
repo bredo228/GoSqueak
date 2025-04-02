@@ -51,8 +51,6 @@ func getTrackInfo(track Track, config Config) LastFmTrack {
 
 	req, err := http.NewRequest("GET", "https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key="+config.LastFmApiKey+"&artist="+url.QueryEscape(track.Artist)+"&track="+url.QueryEscape(track.Title)+"&format=json", nil)
 
-	log.Println(req.URL)
-
 	if err != nil {
 		log.Printf("Error in http request: %d\n", err)
 		return lastFmTrack
