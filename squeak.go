@@ -80,6 +80,7 @@ func sendTrack(track Track, client *osc.Client) {
 	sendOscMessage(track.Album, "/squeaknp/track_album", client)
 	sendOscMessage(track.Artist, "/squeaknp/track_artist", client)
 	sendOscMessage(track.Artwork, "/squeaknp/lastfm_album_art", client)
+	sendOscMessage(track.Url, "/squeaknp/lastfm_url", client)
 
 	// TODO: these are floats not ints
 	sendOscMessage(float32(track.Duration), "/squeaknp/timeline_end_time", client)
@@ -167,7 +168,9 @@ func main() {
 			sendTrack(currentTrack, oscClient)
 
 			if config.LastFmEnabled {
-				currentTrack.Artwork = lastfm.GetTrackArtwork(currentTrack, config)
+				lastFmTrack := lastfm.GetTrackInfo(currentTrack, config)
+				currentTrack.Artwork = lastfm.GetTrackArtwork(lastFmTrack)
+				currentTrack.Url = lastFmTrack.Url
 			}
 
 			log.Println("Updated artwork to " + currentTrack.Artwork)
@@ -175,6 +178,9 @@ func main() {
 		} else {
 			if previousTrack.Artwork != "" {
 				currentTrack.Artwork = previousTrack.Artwork
+			}
+			if previousTrack.Url != "" {
+				currentTrack.Url = previousTrack.Url
 			}
 		}
 

@@ -16,6 +16,7 @@ type LastFmTrackResponse struct {
 
 type LastFmTrack struct {
 	Name  string      `json:"name"`
+	Url   string      `json:"url"`
 	Album LastFmAlbum `json:"album"`
 }
 
@@ -30,20 +31,18 @@ type LastFmImage struct {
 	Size string `json:"size"`
 }
 
-func GetTrackArtwork(track Track, config Config) string {
+func GetTrackArtwork(track LastFmTrack) string {
 
-	lastFmTrack := getTrackInfo(track, config)
-
-	if len(lastFmTrack.Album.Images) < 1 {
+	if len(track.Album.Images) < 1 {
 		return ""
 	}
 
-	image := lastFmTrack.Album.Images[len(lastFmTrack.Album.Images)-1]
+	image := track.Album.Images[len(track.Album.Images)-1]
 
 	return image.Text
 }
 
-func getTrackInfo(track Track, config Config) LastFmTrack {
+func GetTrackInfo(track Track, config Config) LastFmTrack {
 
 	var lastFmTrack LastFmTrack
 
