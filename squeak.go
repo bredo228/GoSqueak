@@ -78,6 +78,41 @@ func getCurrentTrack(obj dbus.BusObject) (Track, error) {
 	return track, nil
 }
 
+// Calling this will lock the program up until it finds a media player.
+func findMusicPlayer(conn *dbus.Conn) string {
+
+	var player string
+
+	for {
+
+		var names []string
+
+		err := conn.BusObject().Call("org.freedesktop.DBus.ListNames", 0).Store(&names)
+
+		if err != nil {
+			log.Fatalf("Failed to get list of owned names: %s\n", err.Error())
+		}
+
+		for _, name := range names {
+			if strings.HasPrefix(name, "org.mpris.MediaPlayer2") {
+				log.Printf("Found media player with name %s", name)
+				player = name
+				break
+			}
+		}
+
+		if player != "" { // If we've found a player, return it
+			return player
+		}
+
+		log.Println("Didn't find a media player, retrying in 10 seconds.")
+
+		time.Sleep(10 * time.Second)
+
+	}
+
+}
+
 func sendTrack(track Track, client *osc.Client) {
 
 	sendOscMessage(track.Title, "/squeaknp/track_title", client)
@@ -123,34 +158,7 @@ func main() {
 	defer conn.Close()
 
 	// find media player
-	var mediaPlayer string
-
-	for {
-		var names []string
-
-		err = conn.BusObject().Call("org.freedesktop.DBus.ListNames", 0).Store(&names)
-
-		if err != nil {
-			log.Fatalf("Failed to get list of owned names: %d\n", err)
-		}
-
-		for _, name := range names {
-			if strings.HasPrefix(name, "org.mpris.MediaPlayer2") {
-				log.Printf("Found media player with name %s", name)
-				mediaPlayer = name
-				break
-			}
-		}
-
-		if mediaPlayer != "" { // we've found a media player, we can continue now
-			break
-		}
-
-		log.Println("Didn't find a media player, retrying in 10 seconds.")
-
-		time.Sleep(10 * time.Second)
-
-	}
+	mediaPlayer := findMusicPlayer(conn)
 
 	obj := conn.Object(mediaPlayer, "/org/mpris/MediaPlayer2")
 
