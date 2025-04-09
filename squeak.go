@@ -172,6 +172,18 @@ func main() {
 
 		currentTrack, err = getCurrentTrack(obj)
 
+		if err != nil {
+
+			// If we get a specific error, the music player has probably been closed so try and find it again.
+			if err.Error() != "The name is not activatable" {
+				log.Fatalf("Error in getCurrentTrack: %s\n", err.Error())
+			}
+
+			log.Println("Failed getting current track - music player has probably been closed.")
+			mediaPlayer = findMusicPlayer(conn)
+			obj = conn.Object(mediaPlayer, "/org/mpris/MediaPlayer2")
+		}
+
 		if previousTrack.Title != currentTrack.Title { // probably a better way to see if the track has changed
 			log.Println("Track title has changed!")
 			log.Printf("Found track %s by %s in %s\n", currentTrack.Title, currentTrack.Artist, currentTrack.Album)
