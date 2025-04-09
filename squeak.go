@@ -21,14 +21,15 @@ func sendOscMessage(message any, path string, client *osc.Client) {
 	client.Send(msg)
 }
 
-func getCurrentTrack(obj dbus.BusObject) Track {
+func getCurrentTrack(obj dbus.BusObject) (Track, error) {
 
 	var track Track
 
 	data, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Metadata")
 
 	if err != nil {
-		log.Panicf("Failed getting property!")
+		log.Println("Failed getting property!")
+		return track, err
 	}
 
 	metadata := data.Value().(map[string]dbus.Variant)
@@ -71,7 +72,7 @@ func getCurrentTrack(obj dbus.BusObject) Track {
 		track.Position = int(pos_i64)
 	}
 
-	return track
+	return track, nil
 }
 
 func sendTrack(track Track, client *osc.Client) {
@@ -158,7 +159,7 @@ func main() {
 
 		previousTrack = currentTrack
 
-		currentTrack = getCurrentTrack(obj)
+		currentTrack, err = getCurrentTrack(obj)
 
 		if previousTrack.Title != currentTrack.Title { // probably a better way to see if the track has changed
 			log.Println("Track title has changed!")
