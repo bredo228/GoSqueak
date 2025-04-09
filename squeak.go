@@ -64,7 +64,10 @@ func getCurrentTrack(obj dbus.BusObject) (Track, error) {
 	pos, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.Position")
 
 	if err != nil {
-		log.Fatalf("Failed getting progress")
+		log.Printf("Failed getting progress")
+		// This is the current position in the song, I'm just going to have the position be 0 if this fails.
+		track.Position = 0
+		return track, nil
 	}
 
 	if pos.Value() != nil {
