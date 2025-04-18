@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"os"
 	"runtime"
@@ -135,16 +136,28 @@ func main() {
 
 	// init config
 
+	var useFallbackConfig bool
+
 	config_file, err := os.ReadFile("./config.json")
-	if err != nil {
+
+	if errors.Is(err, os.ErrNotExist) {
+		log.Println("Config file does not exist, falling back.")
+		useFallbackConfig = true
+	} else if err != nil {
 		log.Fatalf("Error when opening config file: %d\n", err)
 	}
 
 	var config Config
 
-	err = json.Unmarshal(config_file, &config)
-	if err != nil {
-		log.Fatalf("Error unmarshaling config: %d\n", err)
+	if !useFallbackConfig {
+		err = json.Unmarshal(config_file, &config)
+		if err != nil {
+			log.Fatalf("Error unmarshaling config: %d\n", err)
+		}
+	} else {
+		config.Port = 9025
+		config.UpdateRate = 500
+		config.LastFmEnabled = false
 	}
 
 	// init osc client
