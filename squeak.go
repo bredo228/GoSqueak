@@ -237,9 +237,9 @@ func main() {
 				lastFmTrack := lastfm.GetTrackInfo(currentTrack, config)
 				currentTrack.Artwork = lastfm.GetTrackArtwork(lastFmTrack)
 				currentTrack.Url = lastFmTrack.Url
-			}
 
-			log.Printf("Updated artwork to %s and URL to %s\n", currentTrack.Artwork, currentTrack.Url)
+				log.Printf("Updated artwork to %s and URL to %s\n", currentTrack.Artwork, currentTrack.Url)
+			}
 
 		} else {
 			if previousTrack.Artwork != "" {
