@@ -78,6 +78,22 @@ func getCurrentTrack(obj dbus.BusObject) (Track, error) {
 	return track, nil
 }
 
+func getCurrentState(obj dbus.BusObject) (PlaybackState, error) {
+	var state PlaybackState
+
+	data, err := obj.GetProperty("org.mpris.MediaPlayer2.Player.PlaybackStatus")
+	if err != nil {
+		log.Println("failed getting property!")
+		return state, err
+	}
+
+	s := data.Value().(string)
+	s = strings.ToUpper(s)
+	state.State = s
+
+	return state, nil
+}
+
 // Calling this will lock the program up until it finds a media player.
 func findMusicPlayer(conn *dbus.Conn) string {
 
@@ -127,6 +143,11 @@ func sendTrack(track Track, client *osc.Client) {
 
 }
 
+func sendState(state PlaybackState, client *osc.Client) {
+	sendOscMessage(state.State, "/squeaknp/playback_state", client)
+	sendOscMessage(state.StateInt, "/squeaknp/playback_state_int", client)
+}
+
 func main() {
 
 	log.Println("Starting GoSqueak")
@@ -157,6 +178,10 @@ func main() {
 	}
 	defer conn.Close()
 
+	var s PlaybackState
+	s.State = "CLOSED"
+	sendState(s, oscClient)
+
 	// find media player
 	mediaPlayer := findMusicPlayer(conn)
 
@@ -178,6 +203,10 @@ func main() {
 			if err.Error() != "The name is not activatable" {
 				log.Fatalf("Error in getCurrentTrack: %s\n", err.Error())
 			}
+
+			var s PlaybackState
+			s.State = "CLOSED"
+			sendState(s, oscClient)
 
 			log.Println("Failed getting current track - music player has probably been closed.")
 			mediaPlayer = findMusicPlayer(conn)
@@ -209,6 +238,10 @@ func main() {
 		}
 
 		sendTrack(currentTrack, oscClient)
+
+		state, _ := getCurrentState(obj)
+
+		sendState(state, oscClient)
 
 		time.Sleep(time.Millisecond * time.Duration(config.UpdateRate))
 
