@@ -72,6 +72,10 @@ func GetTrackInfo(track Track, config Config) LastFmTrack {
 	}
 
 	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		log.Printf("Error reading body with error %s\n", err.Error())
+
+	}
 	resp.Body.Close()
 
 	if resp.StatusCode > 299 {
