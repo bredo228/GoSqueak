@@ -239,7 +239,7 @@ func main() {
 				currentTrack.Url = lastFmTrack.Url
 			}
 
-			log.Println("Updated artwork to " + currentTrack.Artwork)
+			log.Printf("Updated artwork to %s and URL to %s\n", currentTrack.Artwork, currentTrack.Url)
 
 		} else {
 			if previousTrack.Artwork != "" {
