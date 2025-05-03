@@ -2,6 +2,7 @@ package lastfm
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -44,11 +45,20 @@ func GetTrackArtwork(track LastFmTrack) string {
 
 func GetTrackInfo(track Track, config Config) LastFmTrack {
 
+	var queryString string
 	var lastFmTrack LastFmTrack
 
 	httpClient := &http.Client{}
 
-	req, err := http.NewRequest("GET", "https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key="+config.LastFmApiKey+"&artist="+url.QueryEscape(track.Artist)+"&track="+url.QueryEscape(track.Title)+"&format=json", nil)
+	if track.Album != "" {
+		queryString = fmt.Sprintf("track=%s&album=%s&artist=%s", url.QueryEscape(track.Title), url.QueryEscape(track.Album), url.QueryEscape(track.Artist))
+	} else {
+		queryString = fmt.Sprintf("track=%s&artist=%s", url.QueryEscape(track.Title), url.QueryEscape(track.Artist))
+	}
+
+	requestUrl := fmt.Sprintf("https://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key=%s&%s&format=json", config.LastFmApiKey, queryString)
+
+	req, err := http.NewRequest("GET", requestUrl, nil)
 
 	if err != nil {
 		log.Printf("Error in http request: %d\n", err)
