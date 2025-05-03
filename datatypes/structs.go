@@ -17,3 +17,8 @@ type Config struct {
 	LastFmUsername string `json:"lastFmUsername"`
 	LastFmApiKey   string `json:"lastFmApiKey"`
 }
+
+type PlaybackState struct {
+	State    string
+	StateInt int
+}
