@@ -1,0 +1,8 @@
+{
+    "oscPort": 9025,
+    "websocketListenPort": 9026, 
+    "updateRate": 500,
+    "lastFmEnabled": false,
+    "lastFmUsername": null,
+    "lastFmApiKey": null
+}
